@@ -2,7 +2,7 @@
   <div :style='styleObj' :draggable='isDraggable' @drag.stop='drag' @dragstart.stop='dragStart' @dragover.stop='dragOver' @dragenter.stop='dragEnter' @dragleave.stop='dragLeave' @drop.stop='drop' @dragend.stop='dragEnd' class='dnd-container'>
     <div :class='{"is-clicked": isClicked,"is-hover":isHover}' @click="toggle" @mouseover='mouseOver' @mouseout='mouseOut' @dblclick="changeType">
       <div :style="{ 'padding-left': (this.depth - 1) * 1.5 + 'rem' }" :id='model.id' class='treeNodeText'>
-        <span :class="[isClicked ? 'nodeClicked' : '','vue-drag-node-icon']"></span>
+        <span :class="[isClicked ? 'nodeClicked' : '',isFolder ? 'vue-drag-node-icon' : 'vue-drag-file-icon']"></span>
         <span class='text'>{{model.name}}</span>
       </div>
     </div>
@@ -186,7 +186,7 @@ export default {
 
 <style>
 .dnd-container {
-  background: #fff;
+  background: #f3f3f3;
 }
 
 .dnd-container .is-clicked {
@@ -222,6 +222,14 @@ export default {
 .changeTree {
   width: 1rem;
   color: #324057;
+}
+
+.vue-drag-file-icon {
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  margin-left: 4px;
+  margin-right: 4px;
 }
 
 .vue-drag-node-icon {

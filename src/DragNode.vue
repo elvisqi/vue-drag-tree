@@ -11,9 +11,6 @@
       </item>
     </div>
   </div>
-  <div ref="contextMenu">
-    <slot name="context-menu"></slot>
-  </div>
 </template>
 
 <script>

@@ -103,12 +103,12 @@ export default {
       if (this.currentHighlight) {
         nodeClicked = this.model.id
       }
-      if (!this.isFolder) {
+      /*if (!this.isFolder) {
         this.$set(this.model, 'children', [])
         this.addChild()
         this.open = true
         this.isClicked = true
-      }
+      }*/
     },
     mouseOver(e) {
       this.isHover = true

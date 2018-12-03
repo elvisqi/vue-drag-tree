@@ -11,6 +11,9 @@
       </item>
     </div>
   </div>
+  <div ref="contextMenu">
+    <slot name="context-menu"></slot>
+  </div>
 </template>
 
 <script>
@@ -97,7 +100,6 @@ export default {
         nodeClicked = this.model.id
       }
     },
-
     changeType() {
       // 用户需要高亮-->才纪录当前被点击节点
       if (this.currentHighlight) {

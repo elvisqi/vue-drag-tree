@@ -2,8 +2,15 @@
   <div :style='styleObj' :draggable='isDraggable' @drag.stop='drag' @dragstart.stop='dragStart' @dragover.stop='dragOver' @dragenter.stop='dragEnter' @dragleave.stop='dragLeave' @drop.stop='drop' @dragend.stop='dragEnd' class='dnd-container'>
     <div :class='{"is-clicked": isClicked,"is-hover":isHover}' @click="toggle" @mouseover='mouseOver' @mouseout='mouseOut' @dblclick="changeType">
       <div :style="{ 'padding-left': (this.depth - 1) * 1.5 + 'rem' }" :id='model.id' class='treeNodeText'>
-        <span :class="[isClicked ? 'nodeClicked' : '',isFolder ? 'vue-drag-node-icon' : 'vue-drag-file-icon']"></span>
-        <span class='text'>{{model.name}}</span>
+        <span :class="[isClicked ? 'nodeClicked' : '',this.model.children ? 'vue-drag-node-icon' : 'vue-drag-file-icon']"></span>
+        <ion-icon name="folder" v-if="model.children !== undefined"></ion-icon>
+        <ion-icon name="document" v-else></ion-icon>
+        <div v-if="editable === true" class="dnd-node">
+          <input v-model="model.name">
+          <ion-icon @click="renameHandler" name="ios-checkmark"></ion-icon>
+          <ion-icon @click="cancelHandler" name="ios-close"></ion-icon>
+        </div>
+        <span v-else class='dnd-text'>{{model.name}}</span>
       </div>
     </div>
     <div class='treeMargin' v-show="open" v-if="isFolder">
@@ -30,7 +37,8 @@ export default {
       isHover: false, // 当前节点被hvoer
       styleObj: {
         opacity: 1
-      }
+      },
+      editable: false
     }
   },
   props: {
@@ -65,9 +73,13 @@ export default {
     }
   },
   methods: {
-    toggle() {
+    toggle(e) {
+      if (e.target.tagName === "INPUT") {
+        return;
+      }
+
       if (this.isFolder) {
-        this.open = !this.open
+          this.open = !this.open;
       }
       // 调用vue-drag-tree的父组件中的方法,以传递出当前被点击的节点的id值
       //　API: 对外开放的当前被点击节点的信息
@@ -85,23 +97,26 @@ export default {
         let nodeStack = [treeParent.$children[0]]
         while (nodeStack.length != 0) {
           let item = nodeStack.shift()
-          item.isClicked = false
+          // item.isClicked = false
+          item.editable = false;
           if (item.$children && item.$children.length > 0) {
             nodeStack = nodeStack.concat(item.$children)
           }
         }
         // 然后把当前节点的样式设置为高亮
-        this.isClicked = true
+        // this.isClicked = true
 
         // 设置节点为 当前节点
         nodeClicked = this.model.id
       }
     },
-    changeType() {
+    changeType(e) {
       // 用户需要高亮-->才纪录当前被点击节点
       if (this.currentHighlight) {
         nodeClicked = this.model.id
       }
+      this.editable = true;
+      e.stopPropagation();
       /*if (!this.isFolder) {
         this.$set(this.model, 'children', [])
         this.addChild()
@@ -167,10 +182,22 @@ export default {
       }
       toData = this
       exchangeData(rootTree, fromData, toData)
-      rootTree.emitDrop(this.model, this, e)
+      rootTree.emitDrop(this.model, fromData.model, toData.model, this, e)
     },
     dragEnd(e) {
       rootTree.emitDragEnd(this.model, this, e)
+      return
+    },
+    renameHandler(e) {
+      this.editable = false;
+      rootTree.emitRename(this.model, this, e);
+      e.stopPropagation();
+      return
+    },
+    cancelHandler(e) {
+      this.editable = false;
+      rootTree.emitCancel(this.model, this, e);
+      e.stopPropagation();
       return
     }
   },
@@ -183,7 +210,11 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+ion-icon{
+  margin-right: 4px;
+  flex-shrink: 0;
+}
 .dnd-container {
   background: #f3f3f3;
 }
@@ -204,8 +235,14 @@ export default {
   font-weight: bold;
 }
 
-.text {
+.dnd-text {
   font-size: 12px;
+}
+
+.dnd-node {
+  display: flex;
+  justify-content: center;
+  align-items: Center;
 }
 
 .treeNodeText {
@@ -227,7 +264,7 @@ export default {
   display: inline-block;
   width: 4px;
   height: 4px;
-  margin-left: 4px;
+  margin-left: 12px;
   margin-right: 4px;
 }
 

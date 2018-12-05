@@ -70,8 +70,14 @@ export default {
     emitDragEnd(model, component, e) {
       this.$emit('drag-end', model, component, e)
     },
-    emitDrop(model, component, e) {
-      this.$emit('drop', model, component, e)
+    emitDrop(model, fromData, toData, component, e) {
+      this.$emit('drop', model, fromData, toData, component, e)
+    },
+    emitRename(model, component, e) {
+      this.$emit('rename', model, component, e)
+    },
+    emitCancel(model, component, e) {
+      this.$emit('cancel', model, component, e)
     }
   },
   components: {

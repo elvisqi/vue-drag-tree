@@ -2,7 +2,7 @@
   <div :style='styleObj' :draggable='isDraggable' @drag.stop='drag' @dragstart.stop='dragStart' @dragover.stop='dragOver' @dragenter.stop='dragEnter' @dragleave.stop='dragLeave' @drop.stop='drop' @dragend.stop='dragEnd' class='dnd-container'>
     <div :class='{"is-clicked": isClicked,"is-hover":isHover}' @click="toggle" @mouseover='mouseOver' @mouseout='mouseOut' @dblclick="changeType">
       <div :style="{ 'padding-left': (this.depth - 1) * 1.5 + 'rem' }" :id='model.id' class='treeNodeText'>
-        <span :class="[isClicked ? 'nodeClicked' : '',this.model.children ? 'vue-drag-node-icon' : 'vue-drag-file-icon']"></span>
+        <span :class="[open ? 'nodeClicked' : '',this.model.children ? 'vue-drag-node-icon' : 'vue-drag-file-icon']"></span>
         <ion-icon name="folder" v-if="model.children !== undefined"></ion-icon>
         <ion-icon name="document" v-else></ion-icon>
         <div v-if="editable === true" class="dnd-node">
@@ -77,7 +77,6 @@ export default {
       if (e.target.tagName === "INPUT") {
         return;
       }
-
       if (this.isFolder) {
           this.open = !this.open;
       }
@@ -97,14 +96,14 @@ export default {
         let nodeStack = [treeParent.$children[0]]
         while (nodeStack.length != 0) {
           let item = nodeStack.shift()
-          // item.isClicked = false
+          item.isClicked = false
           item.editable = false;
           if (item.$children && item.$children.length > 0) {
             nodeStack = nodeStack.concat(item.$children)
           }
         }
         // 然后把当前节点的样式设置为高亮
-        // this.isClicked = true
+        this.isClicked = true
 
         // 设置节点为 当前节点
         nodeClicked = this.model.id
